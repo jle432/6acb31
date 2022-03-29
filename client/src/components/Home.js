@@ -66,11 +66,7 @@ const Home = ({ user, logout }) => {
     try {
       const data = await saveMessage(body);
       
-      if (!body.conversationId) {
-        addNewConvo(body.recipientId, data.message);
-      } else {
-        addMessageToConversation(data);
-      }
+      addMessageToConversation(data, body.recipientId);
 
       sendMessage(data, body);
     } catch (error) {
@@ -93,26 +89,34 @@ const Home = ({ user, logout }) => {
   );
 
   const addMessageToConversation = useCallback(
-    (data) => {
+    (data, recipientId) => {
       // if sender isn't null, that means the message needs to be put in a brand new convo
       const { message, sender = null } = data;
-      if (sender !== null) {
-        const newConvo = {
-          id: message.conversationId,
-          otherUser: sender,
-          messages: [message],
-        };
-        newConvo.latestMessageText = message.text;
-        setConversations((prev) => [newConvo, ...prev]);
-      }
-
+      const newConversations = [];
       conversations.forEach((convo) => {
-        if (convo.id === message.conversationId) {
-          convo.messages.push(message);
+        if (sender !== null && recipientId === convo.otherUser.id) {
+          convo.id = message.conversationId;
           convo.latestMessageText = message.text;
+          convo.user1 = null;
+          console.log(convo);
+        };
+        const newConvo = {...convo};
+        const newMessages = [];
+        const newOtherUser = {...convo.otherUser};
+
+        for (const msg of convo.messages) {
+          const newMsg = {...msg};
+          newMessages.push(newMsg);
         }
-      });
-      setConversations(conversations);
+
+        newConvo.messages = newMessages;
+        newConvo.otherUser = newOtherUser;
+        
+        if (newConvo.id === message.conversationId) newConvo.messages.push(message);
+        if (convo.otherUser.username === 'julia') console.log('julia obj', convo);
+        newConversations.push(newConvo);
+      })
+      setConversations(newConversations);
     },
     [setConversations, conversations]
   );
