@@ -112,8 +112,10 @@ const Home = ({ user, logout }) => {
         newConvo.messages = newMessages;
         newConvo.otherUser = newOtherUser;
         
-        if (newConvo.id === message.conversationId) newConvo.messages.push(message);
-        if (convo.otherUser.username === 'julia') console.log('julia obj', convo);
+        if (newConvo.id === message.conversationId) {
+          newConvo.messages.push(message);
+          newConvo.latestMessageText = message.text;
+        }
         newConversations.push(newConvo);
       })
       setConversations(newConversations);
@@ -187,6 +189,7 @@ const Home = ({ user, logout }) => {
     const fetchConversations = async () => {
       try {
         const { data } = await axios.get('/api/conversations');
+        console.log(data);
         setConversations(data);
       } catch (error) {
         console.error(error);
