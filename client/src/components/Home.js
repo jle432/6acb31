@@ -127,6 +127,20 @@ const Home = ({ user, logout }) => {
     [setConversations, conversations]
   );
 
+  const changeMessagesToRead = (conversation) => {
+    setConversations((prev) =>
+        prev.map((convo) => {
+          if (convo.id === conversation.id) {
+            const convoCopy = { ...convo };
+            convoCopy.unreadMessages = 0;
+            return convoCopy;
+          } else {
+            return convo;
+          }
+        })
+      );
+  }
+
   const setActiveChat = (username) => {
     setActiveConversation(username);
   };
@@ -193,7 +207,6 @@ const Home = ({ user, logout }) => {
     const fetchConversations = async () => {
       try {
         const { data } = await axios.get('/api/conversations');
-        console.log(data);
         setConversations(data);
       } catch (error) {
         console.error(error);
@@ -221,6 +234,7 @@ const Home = ({ user, logout }) => {
           clearSearchedUsers={clearSearchedUsers}
           addSearchedUsers={addSearchedUsers}
           setActiveChat={setActiveChat}
+          changeMessagesToRead={changeMessagesToRead}
         />
         <ActiveChat
           activeConversation={activeConversation}

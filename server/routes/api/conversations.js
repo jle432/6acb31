@@ -50,16 +50,14 @@ router.get("/", async (req, res, next) => {
     const totalUnreadMsgs = (messages) => {
       let total = 0;
       for (let i = 0; i < messages.length; i += 1) {
-        if (!messages[i].read) total += 1;
+        if (!messages[i].read && messages[i].senderId !== userId) total += 1;
       }
       return total;
     }
-    // console.log('Inside of conversations route', conversations[0]);
+
     for (let i = 0; i < conversations.length; i++) {
       const convo = conversations[i];
-      // if (i === 0) console.log('regular convo', convo);
       const convoJSON = convo.toJSON();
-      // if (i === 0) console.log('convo after toJson', convoJSON);
 
       // set a property "otherUser" so that frontend will have easier access
       if (convoJSON.user1) {
@@ -82,7 +80,6 @@ router.get("/", async (req, res, next) => {
       convoJSON.unreadMessages = totalUnreadMsgs(convoJSON.messages);
       conversations[i] = convoJSON;
     }
-    console.log(conversations[0]);
     res.json(conversations);
   } catch (error) {
     next(error);
