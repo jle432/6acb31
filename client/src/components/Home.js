@@ -127,6 +127,20 @@ const Home = ({ user, logout }) => {
     [setConversations, conversations]
   );
 
+  const changeMessagesToRead = (conversation) => {
+    setConversations((prev) =>
+        prev.map((convo) => {
+          if (convo.id === conversation.id) {
+            const convoCopy = { ...convo };
+            convoCopy.unreadMessages = 0;
+            return convoCopy;
+          } else {
+            return convo;
+          }
+        })
+      );
+  }
+
   const setActiveChat = (username) => {
     setActiveConversation(username);
   };
@@ -220,6 +234,7 @@ const Home = ({ user, logout }) => {
           clearSearchedUsers={clearSearchedUsers}
           addSearchedUsers={addSearchedUsers}
           setActiveChat={setActiveChat}
+          changeMessagesToRead={changeMessagesToRead}
         />
         <ActiveChat
           activeConversation={activeConversation}
