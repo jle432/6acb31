@@ -49,10 +49,13 @@ router.get("/", async (req, res, next) => {
 
     const totalUnreadMsgs = (messages) => {
       let total = 0;
+      let latestReadMsg = null;
       for (let i = 0; i < messages.length; i += 1) {
-        if (!messages[i].read && messages[i].senderId !== userId) total += 1;
+        const message = messages[i];
+        if (!message.read && message.senderId !== userId) total += 1;
+        else if (message.read && message.senderId === userId) latestReadMsg = message.id;
       }
-      return total;
+      return { total, latestReadMsg };
     }
 
     for (let i = 0; i < conversations.length; i++) {
@@ -77,7 +80,9 @@ router.get("/", async (req, res, next) => {
 
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages[convoJSON.messages.length - 1].text;
-      convoJSON.unreadMessages = totalUnreadMsgs(convoJSON.messages);
+      const { total, latestReadMsg } = totalUnreadMsgs(convoJSON.messages);
+      convoJSON.unreadMessages = total;
+      convoJSON.latestReadMsg = latestReadMsg;
       conversations[i] = convoJSON;
     }
     res.json(conversations);

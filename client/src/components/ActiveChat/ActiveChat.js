@@ -29,7 +29,7 @@ const ActiveChat = ({
 
   const conversation = conversations
     ? conversations.find(
-        (conversation) => conversation.otherUser.username === activeConversation
+        (conversation) => conversation.otherUser.id === activeConversation
       )
     : {};
 
@@ -52,6 +52,7 @@ const ActiveChat = ({
                   messages={conversation.messages}
                   otherUser={conversation.otherUser}
                   userId={user.id}
+                  latestReadMsg={conversation.latestReadMsg}
                 />
                 <Input
                   otherUser={conversation.otherUser}

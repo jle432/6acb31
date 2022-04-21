@@ -44,15 +44,15 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.patch("/", async (req, res, next) => {
+router.patch("/read", async (req, res, next) => {
   try {
     if (!req.user) {
       return res.sendStatus(401);
     }
     const userId = req.user.id;
-    const { conversationId, otherUserId } = req.body;
+    const { conversationId } = req.body;
 
-    const updatedMessages = await Message.update(
+    await Message.update(
       { 
         read: true 
       },
@@ -62,7 +62,8 @@ router.patch("/", async (req, res, next) => {
           conversationId: conversationId,
           senderId: {
             [Op.not]: userId,
-          }
+          },
+          read: false,
         } 
       }
     )
