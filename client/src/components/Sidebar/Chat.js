@@ -17,12 +17,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Chat = ({ conversation, setActiveChat }) => {
+const Chat = ({ conversation, setActiveChat, changeMessagesToRead }) => {
   const classes = useStyles();
   const { otherUser } = conversation;
 
   const handleClick = async (conversation) => {
-    await setActiveChat(conversation.otherUser.username);
+    await setActiveChat(conversation.otherUser.id);
+    if (conversation.unreadMessages > 0) {
+      changeMessagesToRead(conversation);
+    }
   };
 
   return (
