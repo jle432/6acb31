@@ -78,18 +78,19 @@ const Home = ({ user, logout }) => {
     }
   }
 
-  const updateAndPatchReadMsgs = (convo) => {
+  const updateAndPatchReadMsgs = async (convo) => {
     const conversationId = convo.id;
+    const otherUserId = convo.otherUser.id;
     sendReadMessage({
       lastReadMsg: getLastReadMessage(convo.messages),
       conversationId,
-      otherUserId: convo.otherUser.id,
+      otherUserId,
     });
 
     try {
-      axios.patch(`/api/messages/read`, {conversationId});
+      await axios.patch(`/api/messages/read`, {conversationId, currentUserId: user.id, otherUserId});
     } catch (error) {
-      console.error('Caught error', error);
+      console.error(error);
     }
   }
 
@@ -185,9 +186,7 @@ const Home = ({ user, logout }) => {
               convoCopy.messages = [...convo.messages, message];
               convoCopy.latestMessageText = message.text;
               if (message.senderId !== user.id) {
-                // If the current user does not have the sender open in active chat we want to increment unreadMessages property.
                 if (activeConversation !== message.senderId) convoCopy.unreadMessages += 1;
-                // If current user has the sender open in active chat updates need to be made.
                 if (activeConversation === message.senderId) {
                   convoCopy.messages = updateMessagesToRead(convoCopy.messages);
                   updateAndPatchReadMsgs(convoCopy);
@@ -255,7 +254,6 @@ const Home = ({ user, logout }) => {
 
   const updateReadMessage = useCallback((data) => {
     const { lastReadMsg, conversationId, otherUserId } = data;
-    console.log('inside updateReadMessage', lastReadMsg, conversationId, otherUserId);
     if (otherUserId === user.id) {
       setConversations((prev) =>
         prev.map((convo) => {
